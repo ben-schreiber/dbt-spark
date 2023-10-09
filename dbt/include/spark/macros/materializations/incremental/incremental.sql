@@ -21,6 +21,8 @@
   {#-- for SQL model we will create temp view that doesn't have database and schema --#}
   {%- if language == 'sql'-%}
     {%- set tmp_relation = tmp_relation.include(database=false, schema=false) -%}
+  {%- elif language == 'python' and config.get('submission_method') == 'session' -%}
+    {%- set tmp_relation = tmp_relation.include(database=false, schema=true)|replace('`.`', '___') -%}
   {%- endif -%}
 
   {#-- Set Overwrite Mode --#}
@@ -59,7 +61,7 @@
     {%- call statement('main') -%}
       {{ dbt_spark_get_incremental_sql(strategy, tmp_relation, target_relation, existing_relation, unique_key, incremental_predicates) }}
     {%- endcall -%}
-    {%- if language == 'python' -%}
+    {%- if language == 'python' and config.get('submission_method') != 'session' -%}
       {#--
       This is yucky.
       See note in dbt-spark/dbt/include/spark/macros/adapters.sql

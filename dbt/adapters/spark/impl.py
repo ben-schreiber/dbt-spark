@@ -35,6 +35,7 @@ from dbt.adapters.spark import SparkColumn
 from dbt.adapters.spark.python_submissions import (
     JobClusterPythonJobHelper,
     AllPurposeClusterPythonJobHelper,
+    SessionPythonSubmission
 )
 from dbt.adapters.base import BaseRelation
 from dbt.adapters.contracts.relation import RelationType, RelationConfig
@@ -484,6 +485,7 @@ class SparkAdapter(SQLAdapter):
         return {
             "job_cluster": JobClusterPythonJobHelper,
             "all_purpose_cluster": AllPurposeClusterPythonJobHelper,
+            "session": SessionPythonSubmission
         }
 
     def standardize_grants_dict(self, grants_table: agate.Table) -> dict:
