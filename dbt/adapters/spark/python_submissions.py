@@ -293,3 +293,22 @@ class AllPurposeClusterPythonJobHelper(BaseDatabricksHelper):
                     )
             finally:
                 context.destroy(context_id)
+
+
+class SessionPythonSubmission(PythonJobHelper):
+
+    def __init__(self, parsed_model: Dict, credential: SparkCredentials) -> None:
+        # We are already within the session, no need to connect to anything
+        pass
+
+
+    def submit(self, compiled_code: str) -> Any:
+        from pyspark.sql import SparkSession  # Since pyspark is an extra dependency for `session`
+
+        # Not entirely sure why this works, but the `exec` function only
+        # recognizes the `config` class within the `compiled_code` when
+        # only `globals()` are passed. See the `exec` function documentation
+        # for how this alters the behavior of the function
+        global spark
+        spark = SparkSession.builder.getOrCreate()
+        exec(compiled_code, globals())
